@@ -1,10 +1,11 @@
 (function (global, factory) {
-  typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('highcharts')) :
-  typeof define === 'function' && define.amd ? define(['exports', 'highcharts'], factory) :
-  (global = global || self, factory(global.VueHighcharts = {}, global.Highcharts));
-}(this, function (exports, HighchartsOnly) { 'use strict';
+  typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('highcharts'), require('resize-observer-polyfill')) :
+  typeof define === 'function' && define.amd ? define(['exports', 'highcharts', 'resize-observer-polyfill'], factory) :
+  (global = global || self, factory(global.VueHighcharts = {}, global.Highcharts, global.ResizeObserver));
+}(this, function (exports, HighchartsOnly, ResizeObserver) { 'use strict';
 
   HighchartsOnly = HighchartsOnly && HighchartsOnly.hasOwnProperty('default') ? HighchartsOnly['default'] : HighchartsOnly;
+  ResizeObserver = ResizeObserver && ResizeObserver.hasOwnProperty('default') ? ResizeObserver['default'] : ResizeObserver;
 
   var ctors = {
     Highcharts: 'chart',
@@ -55,6 +56,11 @@
       props: {
         options: { type: Object, required: true }
       },
+  	data: function() {
+  		return {
+  			resizeObserver: null
+  		};
+  	},
       watch: {
         options: {
           handler: function () {
@@ -68,10 +74,20 @@
       },
       beforeDestroy: function () {
         this.chart.destroy();
+  	  this.resizeObserver.disconnect();
       },
       methods: {
         $_h_render: function () {
-          this.chart = ctor(this.$el, clone(this.options));
+  		var me = this.chart;
+          me = ctor(this.$el, clone(this.options));
+  		
+  		var reflowChart = function() {
+  			me.reflow();
+  		};
+  		this.resizeObserver = new ResizeObserver(function() {
+  			return reflowChart();
+  		});
+  		this.resizeObserver.observe(this.$el);
         }
       },
       render: render

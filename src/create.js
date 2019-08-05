@@ -1,3 +1,4 @@
+import ResizeObserver from 'resize-observer-polyfill';
 import clone from './clone.js';
 import ctors from './constructors.js';
 
@@ -20,6 +21,11 @@ export default function create(name, Highcharts) {
     props: {
       options: { type: Object, required: true }
     },
+	data: function() {
+		return {
+			resizeObserver: null
+		};
+	},
     watch: {
       options: {
         handler: function () {
@@ -33,10 +39,20 @@ export default function create(name, Highcharts) {
     },
     beforeDestroy: function () {
       this.chart.destroy();
+	  this.resizeObserver.disconnect();
     },
     methods: {
       $_h_render: function () {
-        this.chart = ctor(this.$el, clone(this.options));
+		var me = this.chart;
+        me = ctor(this.$el, clone(this.options));
+		
+		var reflowChart = function() {
+			me.reflow();
+		};
+		this.resizeObserver = new ResizeObserver(function() {
+			return reflowChart();
+		});
+		this.resizeObserver.observe(this.$el);
       }
     },
     render: render
