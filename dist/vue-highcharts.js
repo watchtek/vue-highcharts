@@ -1,11 +1,12 @@
 (function (global, factory) {
-  typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('highcharts'), require('resize-observer-polyfill')) :
-  typeof define === 'function' && define.amd ? define(['exports', 'highcharts', 'resize-observer-polyfill'], factory) :
-  (global = global || self, factory(global.VueHighcharts = {}, global.Highcharts, global.ResizeObserver));
-}(this, function (exports, HighchartsOnly, ResizeObserver) { 'use strict';
+  typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('highcharts'), require('resize-observer-polyfill'), require('lodash/isEmpty')) :
+  typeof define === 'function' && define.amd ? define(['exports', 'highcharts', 'resize-observer-polyfill', 'lodash/isEmpty'], factory) :
+  (global = global || self, factory(global.VueHighcharts = {}, global.Highcharts, global.ResizeObserver, global.isEmpty));
+}(this, function (exports, HighchartsOnly, ResizeObserver, isEmpty) { 'use strict';
 
   HighchartsOnly = HighchartsOnly && HighchartsOnly.hasOwnProperty('default') ? HighchartsOnly['default'] : HighchartsOnly;
   ResizeObserver = ResizeObserver && ResizeObserver.hasOwnProperty('default') ? ResizeObserver['default'] : ResizeObserver;
+  isEmpty = isEmpty && isEmpty.hasOwnProperty('default') ? isEmpty['default'] : isEmpty;
 
   var ctors = {
     Highcharts: 'chart',
@@ -82,7 +83,9 @@
           me.chart = ctor(me.$el, clone(me.options));
   		// add resizeObserver
   		me.resizeObserver = new ResizeObserver(function() {
-  			me.chart.reflow();
+  			if (!isEmpty(me.chart)) {
+  				me.chart.reflow();
+  			}
   		});
   		me.resizeObserver.observe(me.$el);
         }

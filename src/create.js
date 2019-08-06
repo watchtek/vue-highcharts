@@ -1,4 +1,5 @@
 import ResizeObserver from 'resize-observer-polyfill';
+import isEmpty from 'lodash/isEmpty';
 import clone from './clone.js';
 import ctors from './constructors.js';
 
@@ -47,7 +48,9 @@ export default function create(name, Highcharts) {
         me.chart = ctor(me.$el, clone(me.options));
 		// add resizeObserver
 		me.resizeObserver = new ResizeObserver(function() {
-			me.chart.reflow();
+			if (!isEmpty(me.chart)) {
+				me.chart.reflow();
+			}
 		});
 		me.resizeObserver.observe(me.$el);
       }
