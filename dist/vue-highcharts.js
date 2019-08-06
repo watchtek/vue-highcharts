@@ -78,16 +78,13 @@
       },
       methods: {
         $_h_render: function () {
-  		var me = this.chart;
-          me = ctor(this.$el, clone(this.options));
-  		
-  		var reflowChart = function() {
-  			me.reflow();
-  		};
-  		this.resizeObserver = new ResizeObserver(function() {
-  			return reflowChart();
+  		var me = this;
+          me.chart = ctor(me.$el, clone(me.options));
+
+  		me.resizeObserver = new ResizeObserver(function() {
+  			me.chart.reflow();
   		});
-  		this.resizeObserver.observe(this.$el);
+  		me.resizeObserver.observe(me.$el);
         }
       },
       render: render
