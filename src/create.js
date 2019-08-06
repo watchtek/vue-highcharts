@@ -45,7 +45,7 @@ export default function create(name, Highcharts) {
       $_h_render: function () {
 		var me = this;
         me.chart = ctor(me.$el, clone(me.options));
-
+		// add resizeObserver
 		me.resizeObserver = new ResizeObserver(function() {
 			me.chart.reflow();
 		});
