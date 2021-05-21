@@ -40,20 +40,35 @@ export default function create(name, Highcharts) {
     },
     beforeDestroy: function () {
       this.chart.destroy();
-	  this.resizeObserver.disconnect();
+	    this.resizeObserver.disconnect();
     },
     methods: {
       $_h_render: function () {
-		var me = this;
+        this.destroy();
+		    var me = this;
         me.chart = ctor(me.$el, clone(me.options));
-		// add resizeObserver
-		me.resizeObserver = new ResizeObserver(function() {
-			if (!isEmpty(me.chart)) {
-				me.chart.reflow();
-			}
-		});
-		me.resizeObserver.observe(me.$el);
-      }
+        // add resizeObserver
+        me.resizeObserver = new ResizeObserver(function() {
+          if (!isEmpty(me.chart)) {
+            me.chart.reflow();
+          }
+        });
+        me.resizeObserver.observe(me.$el);
+      },
+      // 차트 옵션이 변경될 때마다 차트를 새로 생성하는 바람에 
+      // 1초마다 데이터가 변경되는 트랜잭션 분포(X-view)에서 지속적인 메모리 누수가 발생 (덤프로 확인)
+      // 기존에 생성되었던 차트와 resizeObserver가 있다면 destroy와 disconnect 후 새로 생성
+      destroy: function() {
+        if (this.chart != null) {
+          this.chart.destroy();
+        }
+        if (this.resizeObserver != null) {
+          this.resizeObserver.disconnect();
+        }
+
+        this.chart = null;
+        this.resizeObserver = null;
+      },
     },
     render: render
   };
