@@ -39,8 +39,8 @@ export default function create(name, Highcharts) {
       this.$_h_render();
     },
     beforeDestroy: function () {
-      this.chart.destroy();
-	    this.resizeObserver.disconnect();
+      // chart가 null인 경우에 대해 에러가 발생하여 아래에 해당 부분 처리가 되어 있는 destroy 메소드를 호출
+      this.destroy();
     },
     methods: {
       $_h_render: function () {
